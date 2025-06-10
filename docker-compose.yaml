@@ -1,0 +1,42 @@
+services:
+  ros2-dev:
+    # Build the image from the Dockerfile in the current directory.
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Pass host user/group IDs to the build process to avoid file permission issues.
+      args:
+        USER_ID: ${UID:-1013}
+        GROUP_ID: ${GID:-1013}
+
+    # Name the container for easy reference.
+    container_name: pathfinder_container
+
+    # Use host network for maximum performance and seamless communication.
+    network_mode: "host"
+
+    # Grant access to all NVIDIA GPUs.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, utility, graphics, display, compute]
+
+    # Required for accessing hardware like USB cameras, LIDAR, etc.
+    privileged: true
+
+    # Forward the GUI display from the container to your host machine.
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+
+      # Mount your local 'src' folder into the container's workspace.
+      - ./src:/home/rosuser/ros2_ws/src:rw
+
+    # Keep the container running and enable an interactive terminal.
+    stdin_open: true
+    tty: true

@@ -1,0 +1,13 @@
+# Ignore files and directories related to the build process.
+build/
+install/
+log/
+
+# Ignore common version control, development, and environment files.
+.git/
+.gitignore
+.vscode/
+.env*
+*.pyc
+*.log
+__pycache__/

@@ -1,0 +1,103 @@
+# Name of the GitHub Actions workflow.
+name: ROS 2 CI/CD
+
+# Controls when the workflow will run.
+on:
+  push:
+    branches: [ "master" ] # Triggers on push to the 'master' branch
+  pull_request:
+    branches: [ "master" ] # Triggers on PRs to the 'master' branch
+
+jobs:
+  # Job 1: Build the Docker image once and save it as an artifact.
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image_name: ${{ steps.get_image_name.outputs.image_name }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get Docker Image Name
+        id: get_image_name
+        run: echo "image_name=ros2-pathfinder-image" >> $GITHUB_OUTPUT
+
+      - name: Maximize Build Space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: ${{ steps.get_image_name.outputs.image_name }}:latest
+
+      - name: Save Docker image
+        run: docker save ${{ steps.get_image_name.outputs.image_name }}:latest -o ${{ steps.get_image_name.outputs.image_name }}.tar
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: ${{ steps.get_image_name.outputs.image_name }}.tar
+
+  # Job 2: Run tests using the pre-built image.
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker image
+        run: docker load < ${{ needs.build.outputs.image_name }}.tar
+
+      - name: Build and Test ROS 2 Workspace
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/src:/home/rosuser/ros2_ws/src \
+            ${{ needs.build.outputs.image_name }}:latest \
+            bash -c "colcon build --symlink-install --executor sequential && colcon test --executor sequential && colcon test-result --verbose"
+
+  # Job 3: Push the verified image to Docker Hub.
+  push-to-dockerhub:
+    needs: [build, test]
+    # This job will only run on a push to the master branch, not on pull requests.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker image
+        run: docker load < ${{ needs.build.outputs.image_name }}.tar
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Tag image for push
+        run: |
+          docker tag ${{ needs.build.outputs.image_name }}:latest ${{ secrets.DOCKERHUB_USERNAME }}/ros2_autonomous_pathfinder:latest
+          docker tag ${{ needs.build.outputs.image_name }}:latest ${{ secrets.DOCKERHUB_USERNAME }}/ros2_autonomous_pathfinder:${{ github.sha }}
+
+      - name: Push image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ros2_autonomous_pathfinder:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ros2_autonomous_pathfinder:${{ github.sha }}
