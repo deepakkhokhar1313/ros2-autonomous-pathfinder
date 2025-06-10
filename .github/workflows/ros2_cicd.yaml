@@ -38,8 +38,8 @@ jobs:
       - name: Build Docker Image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: Dockerfile # Refined path to Dockerfile
+          context: ${{ github.workspace }}
+          file: ${{ github.workspace }}/Dockerfile
           load: true
           tags: ${{ steps.get_image_name.outputs.image_name }}:latest
 
