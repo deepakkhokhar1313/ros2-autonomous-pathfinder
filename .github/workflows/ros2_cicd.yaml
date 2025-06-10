@@ -18,10 +18,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # DEBUG: List files to confirm Dockerfile exists
-      - name: List files in workspace
-        run: ls -la
-
       - name: Get Docker Image Name
         id: get_image_name
         run: echo "image_name=ros2-pathfinder-image" >> $GITHUB_OUTPUT
@@ -38,8 +34,8 @@ jobs:
       - name: Build Docker Image
         uses: docker/build-push-action@v5
         with:
-          context: ${{ github.workspace }}
-          file: ${{ github.workspace }}/Dockerfile
+          context: .
+          file: ./Dockerfile
           load: true
           tags: ${{ steps.get_image_name.outputs.image_name }}:latest
 
