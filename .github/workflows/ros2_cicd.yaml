@@ -18,6 +18,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # DEBUG: Confirm the working directory and list files.
+      - name: List files in workspace
+        run: |
+          pwd
+          ls -la
+
       - name: Get Docker Image Name
         id: get_image_name
         run: echo "image_name=ros2-pathfinder-image" >> $GITHUB_OUTPUT
