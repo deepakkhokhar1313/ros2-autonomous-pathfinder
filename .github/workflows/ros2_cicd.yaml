@@ -40,8 +40,8 @@ jobs:
       - name: Build Docker Image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./ros2-autonomous-pathfinder
+          file: ./ros2-autonomous-pathfinder/Dockerfile
           load: true
           tags: ${{ steps.get_image_name.outputs.image_name }}:latest
 
