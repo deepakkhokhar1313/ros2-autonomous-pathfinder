@@ -23,7 +23,7 @@ jobs:
       # Use a step to define the image name, making it accessible to other jobs.
       - name: Get Docker Image Name
         id: get_image_name
-        run: echo "image_name=ros2_autonomous_pathfinder_image" >> $GITHUB_OUTPUT
+        run: echo "image_name=ros2-autonomous-pathfinder" >> $GITHUB_OUTPUT
 
       # This step builds the image but does not push it.
       - name: Build Docker Image
@@ -100,11 +100,11 @@ jobs:
       # Tag the image correctly for pushing to Docker Hub.
       - name: Tag image for push
         run: |
-          docker tag ${{ needs.build.outputs.image_name }}:latest ${{ secrets.DOCKERHUB_USERNAME }}/ros2_autonomous_pathfinder:latest
-          docker tag ${{ needs.build.outputs.image_name }}:latest ${{ secrets.DOCKERHUB_USERNAME }}/ros2_autonomous_pathfinder:${{ github.sha }}
+          docker tag ${{ needs.build.outputs.image_name }}:latest ${{ secrets.DOCKERHUB_USERNAME }}/ros2-autonomous-pathfinder:latest
+          docker tag ${{ needs.build.outputs.image_name }}:latest ${{ secrets.DOCKERHUB_USERNAME }}/ros2-autonomous-pathfinder:${{ github.sha }}
       
       # Push both tags to Docker Hub.
       - name: Push image to Docker Hub
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ros2_autonomous_pathfinder:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ros2_autonomous_pathfinder:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ros2-autonomous-pathfinder:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ros2-autonomous-pathfinder:${{ github.sha }}
