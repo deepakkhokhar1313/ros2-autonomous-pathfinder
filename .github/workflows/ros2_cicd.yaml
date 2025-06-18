@@ -23,7 +23,7 @@ jobs:
       # Use a step to define the image name, making it accessible to other jobs.
       - name: Get Docker Image Name
         id: get_image_name
-        run: echo "image_name=ros2-autonomous-pathfinder" >> $GITHUB_OUTPUT
+        run: echo "image_name=my_user/ros2_autonomous_pathfinder" >> $GITHUB_OUTPUT
 
       # This step builds the image but does not push it.
       - name: Build Docker Image

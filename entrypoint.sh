@@ -16,3 +16,4 @@ fi
 
 # Execute the command passed into the docker run/exec command.
 exec "$@"
+

@@ -1,13 +1,7 @@
 services:
   ros2-dev:
-    # Build the image from the Dockerfile in the current directory.
-    build:
-      context: .
-      dockerfile: Dockerfile
-      # Pass host user/group IDs to the build process to avoid file permission issues.
-      args:
-        USER_ID: ${UID:-1013}
-        GROUP_ID: ${GID:-1013}
+    # Use the image you built with your docker-compose.build.yml file.
+    image: my_user/ros2_autonomous_pathfinder:latest
 
     # Name the container for easy reference.
     container_name: pathfinder_container
