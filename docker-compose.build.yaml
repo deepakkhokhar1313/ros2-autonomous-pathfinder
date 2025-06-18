@@ -9,4 +9,4 @@ services:
         USER_ID: ${UID:-1013}
         GROUP_ID: ${GID:-1013}
     # This explicitly names the image that is created from the final stage.
-    image: my_user/ros2_autonomous_pathfinder:latest
+    image: ros2-autonomous-pathfinder:latest

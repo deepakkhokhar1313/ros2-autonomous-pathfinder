@@ -1,7 +1,7 @@
 services:
   ros2-dev:
     # Use the image you built with your docker-compose.build.yml file.
-    image: my_user/ros2_autonomous_pathfinder:latest
+    image: ros2-autonomous-pathfinder:latest
 
     # Name the container for easy reference.
     container_name: pathfinder_container
