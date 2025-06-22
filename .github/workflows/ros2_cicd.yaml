@@ -69,7 +69,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}/src:/home/rosuser/ros2_ws/src \
             ${{ needs.build.outputs.image_name }}:latest \
-            bash -c "colcon build --merge-install --symlink-install --executor sequential"
+            bash -c "colcon build --merge-install --executor sequential"
 
   # Job 3: Push the verified image to Docker Hub.
   push-to-dockerhub:
