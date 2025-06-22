@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!--
+  This is the XACRO file for our simple differential drive robot, the Pathfinder.
+  It defines the physical structure of the robot using links and joints.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="pathfinder">
+
+  <!-- 1. Constants & Properties -->
+  <!-- Define reusable constants for dimensions. This is a major advantage of XACRO. -->
+  <xacro:property name="chassis_length" value="0.4"/>
+  <xacro:property name="chassis_width" value="0.25"/>
+  <xacro:property name="chassis_height" value="0.1"/>
+  <xacro:property name="wheel_radius" value="0.05"/>
+  <xacro:property name="wheel_thickness" value="0.04"/>
+  <xacro:property name="caster_wheel_radius" value="0.03"/>
+
+  <!-- 2. Base Link (Chassis) -->
+  <!-- The base_link is the main body of the robot, the parent of all other links. -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0.2 0.4 0.8 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- 3. Right Wheel -->
+  <link name="right_wheel_link">
+    <visual>
+      <origin rpy="1.5707 0 0"/> <!-- Rotate the cylinder to be a wheel -->
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_wheel_link"/>
+    <origin xyz="0 -${chassis_width/2} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- 4. Left Wheel -->
+  <link name="left_wheel_link">
+    <visual>
+      <origin rpy="1.5707 0 0"/> <!-- Rotate the cylinder to be a wheel -->
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
+      </geometry>
+      <material name="black"/> <!-- Re-use the 'black' material -->
+    </visual>
+  </link>
+
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel_link"/>
+    <origin xyz="0 ${chassis_width/2} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- 5. Caster Wheel -->
+  <link name="caster_wheel_link">
+    <visual>
+      <geometry>
+        <sphere radius="${caster_wheel_radius}"/>
+      </geometry>
+      <material name="grey">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="caster_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="caster_wheel_link"/>
+    <origin xyz="-${chassis_length/2 - caster_wheel_radius} 0 -${chassis_height/2}"/>
+  </joint>
+
+</robot>
