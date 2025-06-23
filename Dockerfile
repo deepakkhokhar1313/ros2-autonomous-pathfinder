@@ -43,8 +43,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-robot-state-publisher \
     ros-jazzy-rviz2 \
     ros-jazzy-xacro \
+    ros-jazzy-tf-transformations \
     # breaking the system package protection since we are in a controlled container.
-    && pip3 install urdf-parser-py --break-system-packages \
+    && pip3 install --break-system-packages \
+        urdf-parser-py \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a default non-root user. The entrypoint will modify this at runtime.
